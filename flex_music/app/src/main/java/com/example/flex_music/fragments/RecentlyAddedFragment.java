@@ -24,6 +24,9 @@ import com.example.flex_music.fragments.SongsFragment.Song;
 
 import java.util.ArrayList;
 
+/**
+ * Fragment to display a list of songs added in the last 24 hours.
+ */
 public class RecentlyAddedFragment extends Fragment {
 
     private static final int REQUEST_CODE = 102;
@@ -33,12 +36,17 @@ public class RecentlyAddedFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment (reusing recently played layout as they
+        // are identical)
         View view = inflater.inflate(R.layout.fragment_recently_played, container, false);
+
+        // Initialize RecyclerView and Adapter
         recyclerView = view.findViewById(R.id.recyclerViewRecentlyPlayed);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new SongAdapter(recentlyAddedSongs, getContext());
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        adapter = new SongAdapter(recentlyAddedSongs, requireContext());
         recyclerView.setAdapter(adapter);
 
+        // Check for storage permissions on startup
         checkPermission();
         return view;
     }
@@ -46,11 +54,16 @@ public class RecentlyAddedFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Refresh the list when user returns to the fragment
         loadRecentlyAdded();
     }
 
+    /**
+     * Handles permission checking for different Android versions.
+     */
     private void checkPermission() {
-        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ? Manifest.permission.READ_MEDIA_AUDIO
+        String permission = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                ? Manifest.permission.READ_MEDIA_AUDIO
                 : Manifest.permission.READ_EXTERNAL_STORAGE;
 
         if (ContextCompat.checkSelfPermission(requireContext(), permission) != PackageManager.PERMISSION_GRANTED) {
@@ -60,10 +73,14 @@ public class RecentlyAddedFragment extends Fragment {
         }
     }
 
+    /**
+     * Queries the MediaStore for songs added within the last 24 hours.
+     */
     private void loadRecentlyAdded() {
         recentlyAddedSongs.clear();
         ContentResolver contentResolver = requireActivity().getContentResolver();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
         String[] projection = {
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.DATA,
@@ -71,8 +88,10 @@ public class RecentlyAddedFragment extends Fragment {
                 MediaStore.Audio.Media.ARTIST
         };
 
-        // Filter for songs added in last 24 hours
+        // Calculate the timestamp for 24 hours ago
         long twentyFourHoursAgo = (System.currentTimeMillis() / 1000) - (24 * 60 * 60);
+
+        // SQL Filter for music only and recent timing
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0 AND " +
                 MediaStore.Audio.Media.DATE_ADDED + " >= ?";
         String[] selectionArgs = { String.valueOf(twentyFourHoursAgo) };
@@ -95,6 +114,7 @@ public class RecentlyAddedFragment extends Fragment {
             e.printStackTrace();
         }
 
+        // Notify adapter of data changes
         if (adapter != null) {
             adapter.updateSongList(recentlyAddedSongs);
         }

@@ -21,6 +21,10 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
+/**
+ * Fragment to display songs that were played in the last 24 hours.
+ * Data is persisted via SharedPreferences.
+ */
 public class RecentlyPlayedFragment extends Fragment {
 
     private RecyclerView recyclerView;
@@ -33,15 +37,19 @@ public class RecentlyPlayedFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
+        // Inflate the common recently_played layout
         View view = inflater.inflate(R.layout.fragment_recently_played, container, false);
 
+        // UI Initialization
         recyclerView = view.findViewById(R.id.recyclerViewRecentlyPlayed);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        // Preference setup to retrieve history
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
 
+        // Initial data load
         loadRecentlyPlayedSongs();
-        adapter = new SongAdapter(recentlyPlayedList, getContext());
+        adapter = new SongAdapter(recentlyPlayedList, requireContext());
         recyclerView.setAdapter(adapter);
 
         return view;
@@ -50,17 +58,23 @@ public class RecentlyPlayedFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        // Refresh when returning to screen to show newly played songs
         loadRecentlyPlayedSongs();
         if (adapter != null) {
             adapter.updateSongList(recentlyPlayedList);
         }
     }
 
+    /**
+     * Loads the recently played song list from SharedPreferences and filters by
+     * time.
+     */
     private void loadRecentlyPlayedSongs() {
         String json = prefs.getString("recently_played", "");
         recentlyPlayedList.clear();
 
         if (!json.isEmpty()) {
+            // Deserialize JSON list of Songs
             Type type = new TypeToken<ArrayList<SongsFragment.Song>>() {
             }.getType();
             ArrayList<SongsFragment.Song> allSongs = gson.fromJson(json, type);
@@ -68,9 +82,12 @@ public class RecentlyPlayedFragment extends Fragment {
             long now = System.currentTimeMillis();
             long twentyFourHoursAgo = now - (24 * 60 * 60 * 1000);
 
-            for (SongsFragment.Song song : allSongs) {
-                if (song.getLastPlayedTime() >= twentyFourHoursAgo) {
-                    recentlyPlayedList.add(song);
+            // Only add songs played within the last 24 hours
+            if (allSongs != null) {
+                for (SongsFragment.Song song : allSongs) {
+                    if (song.getLastPlayedTime() >= twentyFourHoursAgo) {
+                        recentlyPlayedList.add(song);
+                    }
                 }
             }
         }
