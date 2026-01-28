@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text Styles -->
+    <style name="TextAppearance.FlexMusic.Title" parent="TextAppearance.AppCompat.Title">
+        <item name="android:textSize">@dimen/text_size_xlarge_title</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="TextAppearance.FlexMusic.Subtitle" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textSize">@dimen/text_size_subtitle</item>
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+    <style name="TextAppearance.FlexMusic.Body" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:textColor">@color/textPrimary</item>
+    </style>
+
+    <style name="TextAppearance.FlexMusic.Caption" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">@dimen/text_size_small</item>
+        <item name="android:textColor">@color/textSecondary</item>
+    </style>
+
+    <!-- Card Styles -->
+    <style name="Widget.FlexMusic.Card" parent="Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
+        <item name="cardElevation">@dimen/elevation_card</item>
+        <item name="cardBackgroundColor">@color/white</item>
+        <item name="android:layout_margin">@dimen/spacing_small</item>
+    </style>
+
+    <style name="Widget.FlexMusic.Card.Song" parent="Widget.FlexMusic.Card">
+        <item name="contentPadding">@dimen/spacing_medium</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="Widget.FlexMusic.Button.Icon" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">?attr/selectableItemBackgroundBorderless</item>
+        <item name="android:minWidth">@dimen/touch_target_min</item>
+        <item name="android:minHeight">@dimen/touch_target_min</item>
+    </style>
+</resources>
